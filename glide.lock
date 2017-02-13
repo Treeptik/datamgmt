@@ -1,5 +1,5 @@
 hash: 5f94b29dba4512f41183a8b778058e7a0d7f44e40c9cea4c41f848092e550280
-updated: 2017-02-13T12:24:05.384179724+01:00
+updated: 2017-02-13T13:47:46.075260648+01:00
 imports:
 - name: github.com/docker/distribution
   version: b1993c95303df3d0214129d85382c3c573e4df20
@@ -41,6 +41,11 @@ imports:
   version: 248dadf4e9068a0b3e79f02ed0a610d935de5302
 - name: github.com/Sirupsen/logrus
   version: 3f603f494d61c73457fb234161d8982b9f0f0b71
+- name: github.com/treeptik/datamgmt
+  version: 122c70c11afea9e243f6b6ba531784a36056709d
+  subpackages:
+  - common
+  - logging
 - name: golang.org/x/net
   version: 61557ac0112b576429a0df080e1c2cef5dfbb642
   subpackages:
