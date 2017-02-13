@@ -1,0 +1,68 @@
+version: '2'
+services:
+
+  elasticsearch:
+    container_name: datamgmt-elasticsearch
+    hostname: datamgmt-elasticsearch
+    build:
+      context: ./elasticsearch
+    image: cloudunit/datamgmt-elasticsearch
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    environment:
+      - "TZ=${TZ}"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    privileged: true
+    command: -E cluster.name="cu-mon" -E node.master=true -E node.data=true
+    labels:
+       - "traefik.enable=false"
+
+  logstash:
+    container_name: datamgmt-logstash
+    hostname: datamgmt-logstash
+    build:
+      context: ./logstash
+    image: cloudunit/datamgmt-logstash
+    ports:
+      - "9600:9600"
+      - "12201:12201/udp"
+    volumes:
+     - ./logstash/conf.d:/etc/logstash/conf.d
+    environment:
+      - "TZ=${TZ}"
+    depends_on:
+      - elasticsearch
+    command: -f /etc/logstash/conf.d/ --http.host 0.0.0.0
+    labels:
+       - "traefik.enable=false"
+
+  kibana:
+    container_name: datamgmt-kibana
+    hostname: datamgmt-kibana
+    build:
+      context: ./kibana
+    image: cloudunit/datamgmt-kibana
+    ports:
+      - "5601:5601"
+    volumes:
+      - ./kibana/file:/opt/cloudunit/file
+    environment:
+      - "TZ=${TZ}"
+      - "ELASTICSEARCH_URL=$ELASTICSEARCH_URL"
+    depends_on:
+      - elasticsearch
+    command: kibana
+    labels:
+      - "traefik.frontend.entryPoints=https"
+      - "traefik.backend=kibana"
+      - "traefik.port=5601"
+      - "traefik.frontend.rule=Host:${CU_KIBANA_DOMAIN}"
+
+networks:
+  default:
+    external:
+      name: datamgmt
+volumes:
+  elasticsearch-data:
