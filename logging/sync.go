@@ -9,7 +9,7 @@ import (
   "github.com/docker/docker/client"
   "github.com/docker/docker/api/types"
   "github.com/docker/docker/api/types/events"
-  "github.com/treeptik/cloudunit-datamgmt/common"
+  "github.com/treeptik/datamgmt/common"
 )
 
 //Function to create repetitive config sync

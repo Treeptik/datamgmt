@@ -2,7 +2,7 @@ package logging
 
 import (
   "golang.org/x/net/context"
-  "github.com/treeptik/cloudunit-datamgmt/common"
+  "github.com/treeptik/datamgmt/common"
   "fmt"
   "io"
 )

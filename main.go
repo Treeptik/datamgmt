@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/treeptik/cloudunit-datamgmt/logging"
-	"github.com/treeptik/cloudunit-datamgmt/common"
+	"github.com/treeptik/datamgmt/logging"
+	"github.com/treeptik/datamgmt/common"
 )
 
 func DatamgmgInit() {
