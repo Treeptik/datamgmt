@@ -1,0 +1,5 @@
+package: github.com/Treeptik/datamgmt
+import:
+  - package: github.com/docker/docker
+    version: v1.13.1
+  - package: golang.org/x/net/context
