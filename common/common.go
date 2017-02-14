@@ -1,11 +1,11 @@
 package common
 
 import (
+	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	"fmt"
 )
 
 func ContainerFilter(Labels []string) filters.Args {
