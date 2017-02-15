@@ -5,7 +5,7 @@ Cloudunit logging management agent written in Go, will help you to handle contai
 
 This agent will listen on docker event and if specific labels have been set on the container, it will grep logs file inside the container with a filebeat agent and send the line to a logstash. Once the applicative container is deleted, logging container is deleted as well as the data stored in the elasticsearch backend
 
-![datamgmt logging](documentation/img/datamgmt-logging-concept.jpeg "Cloudunit logging mgmt")
+![datamgmt logging](documentation/img/datamgmt-logging-concept.jpg "Cloudunit logging mgmt")
 
 ## Pre requisite
 
