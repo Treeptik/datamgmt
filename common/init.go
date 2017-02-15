@@ -33,17 +33,17 @@ func InitListener(ModuleName string) types.Listener {
     Destroy: destroy_messages,
   }
   EventsListener = append(EventsListener, listener)
-  return listener
+  return listener//listener
 }
 
-func Listener() {
-  fmt.Println("toto", EventsListener)
+//func Listener() {
+  //fmt.Println("toto", EventsListener)
   //module.StartModule(EventsListener)
   //listener.StartModule(EventListener)
   //for _, EventListener := range EventsListener {
     //listener.StartModule(EventListener)
   //}
-}
+//}
   /*start_messages, errs := client.Events(context.Background(), EventFitler([]string{"start"}, []string{"logging=enabled", "logging-type=file"}))
   stop_messages, errs := client.Events(context.Background(), EventFitler([]string{"die", "stop", "kill"}, []string{"logging=enabled", "logging-type=file"}))
   destroy_messages, errs := client.Events(context.Background(), EventFitler([]string{"destroy"}, []string{"logging=enabled", "logging-type=file"}))

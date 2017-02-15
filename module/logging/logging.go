@@ -12,18 +12,23 @@ import (
 
 const ModuleName = "logging"
 
-//var (
-  //  "elasticsearchUrl" = {"http://elasticsearch:9200"},
-  //  "logstashUrl" = {"http://logstash:9600"},
-//)
-var channels types.Listener
+//var channels types.Listener
+var (
+  channels types.Listener
+  parameters = map[string]string{
+    "elasticsearchUrl": "http://elasticsearch:9200",
+    "logstashUrl":      "http://logstash:9600",
+  }
+)
 
 func init() {
   //common.AddModule()
+  for _, parameter := range parameters {
+    common.CheckHttp(parameter)
+  }
   channels = common.InitListener(ModuleName)
   fmt.Println(channels)
-  Start()
-  //Start(channels)
+  //Start()
 }
 
 //func Start(channels types.Listener) {
@@ -46,15 +51,12 @@ func Start() {
       //    fmt.Println(err)
       //  }
       //  break loop
-    case e := <-channels.Start:
-        fmt.Println("Logging start")
-        StartLogging(client, e)
+      case e := <-channels.Start:
+        go StartLogging(client, e)
       case e := <-channels.Stop:
-        fmt.Println("Logging stop")
-        StopLogging(client, e)
+        go StopLogging(client, e)
       case e := <-channels.Destroy:
-        fmt.Println("Logging destroy")
-        DestroyLogging(client, e)
+        go DestroyLogging(client, e)
     }
   }
 }
