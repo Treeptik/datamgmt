@@ -26,7 +26,7 @@ func CheckImages(client *client.Client) {
     os.Exit(1)
   } else {
     if len(images) == 0 {
-      fmt.Println("Lets build image")
+      fmt.Println("cloudunit/datamgmt-filebeat:latest image does not exist")
     }
   }
 }
