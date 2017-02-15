@@ -1,5 +1,16 @@
 # datamgmt
-Cloudunit logging management agent
+Cloudunit logging management agent written in Go, will help you to handle container logging, especially for file logging.
+
+# How does it work
+
+This agent will listen on docker event and if specific labels have been set on the container, it will grep logs file inside the container with a filebeat agent and send the line to a logstash. Once the applicative container is deleted, logging container is deleted as well as the data stored in the elasticsearch backend
+
+## Pre requisite
+
+For the moment only filebeat agent is available to grep logs and logstash is used with elasticsearch to parse and store logs.
+Configuration of the agent is done with a label ("application-type") wich have to be set to the application type of the container (tomcat, wildfly, ..) and the configuration file will be loaded.
+
+
 
 # Contributing
 
