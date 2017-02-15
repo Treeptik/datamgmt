@@ -2,6 +2,9 @@ package common
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+	"io/ioutil"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
@@ -49,4 +52,36 @@ func EventFitler(Events []string, Labels []string) (types.EventsOptions) {
     Filters: filters,
   }
 	return options
+}
+
+func DeleteData(container_name, elasticsearchUrl, index string) error {
+	body := strings.NewReader(`
+	{
+		"query": {
+			"bool" : {
+				"should" : [
+					{ "term" : { "docker.container.name" : "`+container_name+`" } },
+					{ "term" : { "beat.name" : "`+container_name+`" } },
+					{ "term" : { "container_name" : "`+container_name+`" } },
+					{ "term" : { "host" : "`+container_name+`" } }
+				],
+				"minimum_should_match" : 1,
+				"boost" : 1.0
+			}
+		}
+	}`)
+
+	req, _ := http.NewRequest("POST", elasticsearchUrl+"/"+index+"/_delete_by_query", body)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+			panic(err)
+	}
+	defer resp.Body.Close()
+	_, err = ioutil.ReadAll(resp.Body)
+	if err == nil {
+		//fmt.Println(string(htmlData))
+		fmt.Println("Successfully delete backend data")
+	}
+	return err
 }
