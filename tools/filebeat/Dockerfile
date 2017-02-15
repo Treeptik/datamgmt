@@ -1,7 +1,7 @@
 FROM alpine:3.5
 MAINTAINER s.musso@treeptik.fr
 
-ENV FILEBEAT_VERSION 5.1.2
+ENV FILEBEAT_VERSION 5.2
 
 ## Get Filebeat binaries
 RUN mkdir -p /opt/datamgmt \
