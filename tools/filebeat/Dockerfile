@@ -13,14 +13,14 @@ RUN mkdir -p /opt/datamgmt \
     && rm filebeat-$FILEBEAT_VERSION-linux-x86_64.tar.gz \
     && rm -rf /var/cache/apk/*
 
-#RUN adduser filebeat -D \
-#    && chown -R filebeat:filebeat /opt/datamgmt
-
 COPY filebeat-conf /opt/datamgmt/filebeat/conf.d
+
+RUN adduser filebeat -u 10000 -D \
+    && chown -R filebeat:filebeat /opt/datamgmt
 
 VOLUME /opt/datamgmt/filebeat
 
-#USER filebeat
+USER filebeat
 
 COPY docker-entrypoint.sh /
 
