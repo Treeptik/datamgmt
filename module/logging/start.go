@@ -22,34 +22,7 @@ func StartLogging(client *client.Client, message events.Message) {
   inspect_result, err := client.ContainerInspect(context.Background(), containername)
   if err != nil  {
     if strings.Contains(err.Error(), "No such container:") {
-      fmt.Println("Logging container doesn't exist lets create and start it")
-      execid, err := client.ContainerExecCreate(context.Background(), basecontainer, types.ExecConfig{
-		    Tty:          true,
-        AttachStdout: true,
-        Cmd:          []string{"id", "-u"},
-	    })
-      var gid string
-      if err != nil {
-        fmt.Println("Error When creating exec task")
-      } else {
-          output, err := client.ContainerExecAttach(context.Background(), execid.ID, types.ExecConfig{
-            Tty:          true,
-            AttachStdout: true,
-            Cmd:          []string{"id", "-u"},
-          })
-          if err != nil {
-            fmt.Println("Error on ExecAttach")
-          } else {
-            scanner := bufio.NewScanner(output.Reader)
-            for scanner.Scan() {
-              gid = scanner.Text()
-	          }
-            if err != nil {
-              fmt.Println("Err while converting uidtemp to uid", err)
-            }
-          }
-      }
-      user := "10000:"+gid
+      user := GetGID(client, basecontainer)
       labels := make(map[string]string)
       labels["origin"] = "datamgmt"
       labels["application-type"] = "filebeat"
@@ -79,4 +52,30 @@ func StartLogging(client *client.Client, message events.Message) {
       fmt.Println("Container aleady running")
     }
   }
+}
+
+func GetGID(client *client.Client, basecontainer string) string {
+  execid, err := client.ContainerExecCreate(context.Background(), basecontainer, types.ExecConfig{})
+  var gid string
+  if err != nil {
+    fmt.Println("Error When creating exec task")
+  } else {
+      output, err := client.ContainerExecAttach(context.Background(), execid.ID, types.ExecConfig{
+        Tty:          true,
+        AttachStdout: true,
+        Cmd:          []string{"id", "-g"},
+      })
+      if err != nil {
+        fmt.Println("Error on ExecAttach")
+      } else {
+        scanner := bufio.NewScanner(output.Reader)
+        for scanner.Scan() {
+          gid = scanner.Text()
+        }
+        if err != nil {
+          fmt.Println("Err while converting uidtemp to uid", err)
+        }
+      }
+  }
+  return "filebeat:"+gid
 }
