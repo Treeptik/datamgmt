@@ -56,7 +56,7 @@ func StartLogging(client *client.Client, message events.Message) {
       network := map[string]*networktypes.EndpointSettings{
 			    "datamgmt": {},
 		  }
-      r, err := client.ContainerCreate(context.Background(), &container.Config{Hostname: basecontainer, User: user, Labels: labels, Image: "cloudunit/datamgmt-filebeat:latest", Env: []string{"APPLICATION_TYPE="+message.Actor.Attributes["application-type"]}}, &container.HostConfig{ VolumesFrom: []string{basecontainer}}, &networktypes.NetworkingConfig{ EndpointsConfig: network}, containername)
+      r, err := client.ContainerCreate(context.Background(), &container.Config{Hostname: basecontainer, User: user, Labels: labels, Image: "cloudunit/datamgmt-filebeat:latest", Env: []string{"APPLICATION_TYPE="+message.Actor.Attributes["application-type"], "APPLICATION_LOGS_PATH="+message.Actor.Attributes["application-logs-path"]}}, &container.HostConfig{ VolumesFrom: []string{basecontainer}}, &networktypes.NetworkingConfig{ EndpointsConfig: network}, containername)
       if err != nil {
         fmt.Println("Could not create filebeat container", err)
       } else {
@@ -66,7 +66,7 @@ func StartLogging(client *client.Client, message events.Message) {
         }
       }
     } else {
-      fmt.Println("Error on container inspect", err)
+      fmt.Println("Unexpected error on container inspect", err)
     }
   } else {
     if inspect_result.State.Status != "running" {
