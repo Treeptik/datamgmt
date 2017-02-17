@@ -29,5 +29,5 @@ simply set it to your home directory (`export GOPATH=$HOME`).
     $ mkdir -p ${GOPATH}/src/github.com/treeptik
     $ cd ${GOPATH}/src/github.com/treeptik
     $ git clone https://github.com/treeptik/datamgmt.git
-    $ glide up
+    $ cd datamgmt && glide up
     $ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build
