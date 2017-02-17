@@ -55,16 +55,17 @@ func StartLogging(client *client.Client, message events.Message) {
 }
 
 func GetGID(client *client.Client, basecontainer string) string {
-  execid, err := client.ContainerExecCreate(context.Background(), basecontainer, types.ExecConfig{})
-  var gid string
+  execconfig := types.ExecConfig{
+    Tty:          true,
+    AttachStdout: true,
+    Cmd:          []string{"id", "-g"},
+  }
+  execid, err := client.ContainerExecCreate(context.Background(), basecontainer, execconfig)
+  var gid string = "0"
   if err != nil {
     fmt.Println("Error When creating exec task")
   } else {
-      output, err := client.ContainerExecAttach(context.Background(), execid.ID, types.ExecConfig{
-        Tty:          true,
-        AttachStdout: true,
-        Cmd:          []string{"id", "-g"},
-      })
+      output, err := client.ContainerExecAttach(context.Background(), execid.ID, execconfig)
       if err != nil {
         fmt.Println("Error on ExecAttach")
       } else {
@@ -77,5 +78,6 @@ func GetGID(client *client.Client, basecontainer string) string {
         }
       }
   }
+  fmt.Println("filebeat:"+gid)
   return "filebeat:"+gid
 }
