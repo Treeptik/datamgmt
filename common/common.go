@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
+	"encoding/json"
 )
 
 func ContainerFilter(Labels []string) filters.Args {
@@ -54,23 +55,36 @@ func EventFitler(Events []string, Labels []string) (types.EventsOptions) {
 	return options
 }
 
+type ESDeleteResponse struct {
+	TimedOut         bool  `json:"timed_out"`
+	Deleted          int64 `json:"deleted"`
+}
+
+func GetESResponse(body []byte) (*ESDeleteResponse, error) {
+    var s = new(ESDeleteResponse)
+    err := json.Unmarshal(body, &s)
+    if(err != nil){
+        fmt.Println("error in :", err)
+    }
+    return s, err
+}
+
 func DeleteData(container_name, elasticsearchUrl, index string) error {
 	body := strings.NewReader(`
-	{
-		"query": {
-			"bool" : {
-				"should" : [
-					{ "term" : { "docker.container.name" : "`+container_name+`" } },
-					{ "term" : { "beat.name" : "`+container_name+`" } },
-					{ "term" : { "container_name" : "`+container_name+`" } },
-					{ "term" : { "host" : "`+container_name+`" } }
-				],
-				"minimum_should_match" : 1,
-				"boost" : 1.0
+		{
+			"query": {
+				"bool" : {
+					"should" : [
+						{ "term" : { "docker.container.name.keyword" : { "value": "`+container_name+`" } } },
+						{ "term" : { "beat.name.keyword" : { "value": "`+container_name+`" } } },
+						{ "term" : { "container_name.keyword" : { "value": "`+container_name+`" } } },
+						{ "term" : { "host.keyword" : { "value": "`+container_name+`" } } }
+					],
+					"minimum_should_match" : 1,
+					"boost" : 1.0
+				}
 			}
-		}
-	}`)
-
+		}`)
 	req, _ := http.NewRequest("POST", elasticsearchUrl+"/"+index+"/_delete_by_query", body)
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
@@ -78,10 +92,10 @@ func DeleteData(container_name, elasticsearchUrl, index string) error {
 			panic(err)
 	}
 	defer resp.Body.Close()
-	_, err = ioutil.ReadAll(resp.Body)
-	if err == nil {
-		//fmt.Println(string(htmlData))
-		fmt.Println("Successfully delete backend data")
+	bodyresp, err := ioutil.ReadAll(resp.Body)
+	s, err := GetESResponse([]byte(bodyresp))
+	if err == nil && s.TimedOut == false && s.Deleted > 0 {
+		fmt.Printf("Successfully delete %d documents for %s\n", s.Deleted, container_name)
 	}
 	return err
 }

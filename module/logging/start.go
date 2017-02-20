@@ -78,6 +78,5 @@ func GetGID(client *client.Client, basecontainer string) string {
         }
       }
   }
-  fmt.Println("filebeat:"+gid)
   return "filebeat:"+gid
 }
